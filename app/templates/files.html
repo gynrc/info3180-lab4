@@ -3,9 +3,11 @@
 {% block main %}
   <h1 class="page-header">Uploaded Images</h1>
 
-  <div class="image-grid">
-    {% for image_url in image_urls %}
-      <div class="image-grid-item"><img src="{{ image_url }}" /></div>
-    {% endfor %}
+  <div class="image-grid-container">
+    <div class="image-grid">
+      {% for image_url in image_urls %}
+        <div class="image-grid-item"><img src="{{ image_url }}" /></div>
+      {% endfor %}
+    </div>
   </div>
 {% endblock %}
