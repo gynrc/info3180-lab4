@@ -1,6 +1,6 @@
 import os
 from app import app, db, login_manager
-from flask import render_template, request, redirect, url_for, flash, session, abort
+from flask import render_template, request, redirect, url_for, flash, session, abort, send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash
@@ -28,14 +28,41 @@ def about():
 @login_required
 def upload():
     form = UploadForm()
-
-    if form.validate_on_submit():
-        f = form.image.data
-        filename = secure_filename(f.filename)
-        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        flash('File Saved', 'success')
-        return redirect(url_for('home')) # Update this to redirect the user to a route that displays all uploaded image files
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            f = form.image.data
+            filename = secure_filename(f.filename)
+            f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            flash('File Saved', 'success')
+        return redirect(url_for('files')) 
     return render_template('upload.html', form=form)
+
+
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    return send_from_directory(os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER']), filename)
+
+
+def get_uploaded_images():
+    upload_dir = os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'])
+    filenames = []
+    for filename in os.listdir(upload_dir):
+        if filename.endswith('.jpg') or filename.endswith('.png'):
+            filenames.append(filename)
+    return filenames
+
+
+@app.route('/files')
+@login_required
+def files():
+    # Call the get_uploaded_images function to get a list of filenames
+    filenames = get_uploaded_images()
+
+    # Generate a list of image URLs using the url_for function
+    image_urls = [url_for('get_image', filename=filename) for filename in filenames]
+
+    # Pass the list of image URLs to the template
+    return render_template('files.html', image_urls=image_urls)
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -54,6 +81,14 @@ def login():
         else:
             flash('Invalid username or password')
     return render_template('login.html', form=form)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('You have been logged out.', 'success')
+    return redirect(url_for('home'))
 
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
