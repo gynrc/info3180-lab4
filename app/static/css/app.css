@@ -20,17 +20,18 @@ body {
 }
 
 .image-grid {
+  margin-top: 30px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    grid-gap: 10px;
-  }
+    grid-gap: 20px;
+}
 
-  .image-grid-item {
+.image-grid-item {
     margin: 0;
     padding: 0;
-  }
+}
 
-  .image-grid-item img {
+.image-grid-item img {
     max-width: 100%;
     height: auto;
-  }
+}

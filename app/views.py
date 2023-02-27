@@ -38,11 +38,6 @@ def upload():
     return render_template('upload.html', form=form)
 
 
-@app.route('/uploads/<filename>')
-def get_image(filename):
-    return send_from_directory(os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER']), filename)
-
-
 def get_uploaded_images():
     upload_dir = os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'])
     filenames = []
@@ -50,6 +45,11 @@ def get_uploaded_images():
         if filename.endswith('.jpg') or filename.endswith('.png'):
             filenames.append(filename)
     return filenames
+
+
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    return send_from_directory(os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER']), filename)
 
 
 @app.route('/files')
